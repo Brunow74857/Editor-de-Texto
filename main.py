@@ -8,6 +8,9 @@ app.title("Editor de texto - Sem titulo")
 app.resizable(False, False)
 arquvioAberto : bool = False
 caminho : str = ""
+tipo : str = ""
+
+tipos : list[str] = [".cmd", ".bat", ".py"]
 
 def mudar_titulo(nome : str) -> None:
     app.title(f"Editor de texto - {nome}")
@@ -22,6 +25,13 @@ def carregarArquivo() -> None:
     if file == "":
         return None
     
+    try:
+        global tipo
+        extensao = os.path.splitext(file)
+        tipo = extensao[1]
+    except:
+        print("Erro ao coletar extensão do arquivo")
+
     global caminho
     global arquvioAberto
     mudar_titulo(os.path.basename(file))
@@ -43,6 +53,13 @@ def salvarcomo() -> None:
 
     if file == "":
         return None
+    
+    try:
+        global tipo
+        extensao = os.path.splitext(file)
+        tipo = extensao[1]
+    except:
+        print("Erro ao coletar extensão do arquivo")
     
     global arquvioAberto
     global caminho
@@ -70,8 +87,22 @@ def salvando() -> None:
     else:
         salvarcomo()
 
+def rodar() -> None:
+    
+    if not tipo in tipos:
+        return None
+    
+    os.chdir(os.path.dirname(caminho))
+
+    if tipo == ".cmd" or tipo == ".bat":
+        os.system(f"start cmd.exe /c {caminho}")
+    elif tipo == ".py":
+        os.system(f"start cmd.exe /c py {caminho}")
+
 menus = Menu(app)
 arquivo = Menu(menus, tearoff=0)
+arquivo.add_command(label="Rodar", command=rodar)
+arquivo.add_separator()
 arquivo.add_command(label="Abrir", command=carregarArquivo)
 arquivo.add_command(label="Salvar", command=salvando)
 arquivo.add_command(label="Salvar como", command=salvarcomo)
